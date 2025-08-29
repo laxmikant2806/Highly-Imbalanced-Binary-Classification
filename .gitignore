@@ -1,0 +1,120 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyTorch Model Files
+*.pth
+*.pt
+*.pkl
+best_fraud_model.pth
+fraud_detection_pipeline.pth
+
+# Dataset Files
+*.csv
+*.json
+*.parquet
+*.h5
+*.hdf5
+data/
+datasets/
+creditcard.csv
+fraud_detection_results.csv
+
+# Kaggle
+.kaggle/
+kaggle.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Operating System
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+tensorboard_logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Model artifacts and experiments
+experiments/
+outputs/
+runs/
+mlruns/
+wandb/
+.neptune/
+
+# Configuration files with sensitive data
+config.ini
+secrets.yaml
+credentials.json
+
+# Large files that shouldn't be tracked
+*.zip
+*.tar.gz
+*.rar
+
+# Backup files
+*.bak
+*.backup
+
+# Cache directories
+.cache/
+.pytest_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+
+# Git
+.git/
