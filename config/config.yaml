@@ -1,0 +1,43 @@
+# Configuration for the Fraud Detection Pipeline
+
+data:
+  raw_data_path: "data/creditcard.csv"
+  results_path: "fraud_detection_results.csv"
+
+model:
+  model_save_path: "models/best_fraud_model.pth"
+  pipeline_save_path: "models/fraud_detection_pipeline.pth"
+  input_dim: 29 # V1-V28, Time, Amount
+  hidden_dims: [256, 128, 64]
+
+training:
+  epochs: 50
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  patience: 10
+  factor: 0.5
+  max_grad_norm: 1.0
+  use_hard_mining: true
+  neg_pos_ratio: 3
+
+loss:
+  focal_loss:
+    alpha: 1
+    gamma: 2
+
+data_processing:
+  test_size: 0.2
+  val_size: 0.2
+  random_state: 42
+  resampling:
+    smote:
+      sampling_strategy: 0.1
+
+evaluation:
+  default_threshold: 0.5
+  optimize_threshold_method: 'cost' # 'cost' or 'f1'
+
+synthetic_data:
+  generate: false # Set to true to generate synthetic data if real data is not found
+  n_samples: 50000
+  fraud_rate: 0.0017
