@@ -34,8 +34,23 @@ def main():
     if data is None:
         return
 
-    X = data.drop('Class', axis=1).values
-    y = data['Class'].values
+    # Clean data: ensure Class column is numeric (OpenML dataset has strings like '0', '1')
+    if data['Class'].dtype == 'object':
+        data['Class'] = data['Class'].str.strip("'").astype(int)
+    
+    # Ensure all feature columns are float
+    for col in data.columns:
+        if col != 'Class':
+            data[col] = pd.to_numeric(data[col], errors='coerce')
+    
+    # Drop any rows with NaN values
+    data = data.dropna()
+    
+    print(f"Dataset shape: {data.shape}")
+    print(f"Fraud cases: {data['Class'].sum()} ({data['Class'].mean()*100:.2f}%)")
+
+    X = data.drop('Class', axis=1).values.astype(np.float32)
+    y = data['Class'].values.astype(np.float32)
 
     X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y, config)
     X_train_scaled, X_val_scaled, X_test_scaled, scaler = scale_features(X_train, X_val, X_test)
@@ -45,11 +60,11 @@ def main():
     trained_model = train_model(model, X_resampled, y_resampled, X_val_scaled, y_val, config)
 
     pipeline = FraudDetectionPipeline(trained_model, scaler)
-    optimal_threshold = pipeline.optimize_threshold(X_val_scaled, y_val, method=config['evaluation']['optimize_threshold_method'])
+    optimal_threshold = pipeline.optimize_threshold(X_val_scaled, y_val, method=config['evaluation']['optimize_threshold_method'], scale=False)
     print(f"Optimal threshold: {optimal_threshold:.4f}")
 
     print("\nFinal Evaluation:")
-    test_probs = pipeline.predict_proba(X_test_scaled)
+    test_probs = pipeline.predict_proba(X_test_scaled, scale=False)
     evaluator = ImbalancedEvaluator()
 
     metrics_default = evaluator.compute_metrics(y_test, test_probs, threshold=config['evaluation']['default_threshold'])

@@ -2,7 +2,6 @@ import torch
 from fastapi import FastAPI
 from pydantic import BaseModel
 import numpy as np
-import joblib
 from src.modeling.model import FraudDetector
 from src.utils.utils import load_config
 from src.modeling.predict import FraudDetectionPipeline

@@ -11,12 +11,17 @@ class FraudDetectionPipeline:
         self.threshold = threshold
         self.evaluator = ImbalancedEvaluator()
 
-    def predict_proba(self, X):
-        """Generates probability predictions for the input data."""
+    def predict_proba(self, X, scale=True):
+        """Generates probability predictions for the input data.
+        
+        Args:
+            X: Input features
+            scale: Whether to apply scaling. Set to False if data is already scaled.
+        """
         if not isinstance(X, np.ndarray):
             X = np.array(X)
 
-        X_scaled = self.scaler.transform(X)
+        X_scaled = self.scaler.transform(X) if scale else X
         X_tensor = torch.tensor(X_scaled, dtype=torch.float32)
 
         self.model.eval()
@@ -24,13 +29,13 @@ class FraudDetectionPipeline:
             logits = self.model(X_tensor)
             return torch.sigmoid(logits).numpy()
 
-    def predict(self, X):
+    def predict(self, X, scale=True):
         """Generates binary predictions based on the optimized threshold."""
-        return (self.predict_proba(X) >= self.threshold).astype(int)
+        return (self.predict_proba(X, scale=scale) >= self.threshold).astype(int)
 
-    def optimize_threshold(self, X_val, y_val, method='cost'):
+    def optimize_threshold(self, X_val, y_val, method='cost', scale=True):
         """Optimizes the prediction threshold based on the specified method."""
-        probabilities = self.predict_proba(X_val)
+        probabilities = self.predict_proba(X_val, scale=scale)
         precision, recall, thresholds = precision_recall_curve(y_val, probabilities)
 
         if method == 'cost':

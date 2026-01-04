@@ -2,7 +2,7 @@ pandas
 numpy
 torch
 scikit-learn
-imblearn
+imbalanced-learn
 pyyaml
 fastapi
 uvicorn
