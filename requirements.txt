@@ -4,6 +4,9 @@ torch
 scikit-learn
 imbalanced-learn
 pyyaml
+lightgbm
+xgboost
+optuna
 fastapi
 uvicorn
 pydantic

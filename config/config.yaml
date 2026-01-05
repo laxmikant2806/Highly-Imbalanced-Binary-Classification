@@ -1,43 +1,93 @@
-# Configuration for the Fraud Detection Pipeline
+# Configuration for the Optimized Fraud Detection Pipeline
 
 data:
   raw_data_path: "data/creditcard.csv"
   results_path: "fraud_detection_results.csv"
 
 model:
+  type: "mlp"  # Options: "mlp", "attention"
   model_save_path: "models/best_fraud_model.pth"
   pipeline_save_path: "models/fraud_detection_pipeline.pth"
-  input_dim: 29 # V1-V28, Time, Amount
-  hidden_dims: [256, 128, 64]
+  input_dim: 30  # Base features (will be expanded with engineered features)
+  hidden_dims: [512, 256, 128, 64]
+  dropout: 0.3
+  use_residual: true
+  num_heads: 4  # For attention model
 
 training:
-  epochs: 50
+  epochs: 100
   learning_rate: 0.001
   weight_decay: 0.0001
   patience: 10
   factor: 0.5
   max_grad_norm: 1.0
-  use_hard_mining: true
+  use_hard_mining: false
   neg_pos_ratio: 3
+  scheduler: "reduce_on_plateau"  # Options: "reduce_on_plateau", "one_cycle", "cosine"
+  early_stopping_patience: 15
+  batch_size: null  # null for full batch, or integer for mini-batch
 
 loss:
+  type: "focal"  # Options: "focal", "weighted_bce", "asymmetric_focal"
   focal_loss:
-    alpha: 1
-    gamma: 2
+    alpha: 0.25
+    gamma: 2.0
+  gamma_pos: 0  # For asymmetric focal
+  gamma_neg: 4  # For asymmetric focal
 
 data_processing:
   test_size: 0.2
   val_size: 0.2
   random_state: 42
   resampling:
+    strategy: "smote_tomek"  # Options: "smote", "borderline_smote", "adasyn", "smote_tomek", "smote_enn"
     smote:
       sampling_strategy: 0.1
 
 evaluation:
   default_threshold: 0.5
-  optimize_threshold_method: 'cost' # 'cost' or 'f1'
+  optimize_threshold_method: 'cost'  # Options: 'cost', 'f1', 'f2', 'precision_target', 'recall_target'
+
+# LightGBM configuration
+lightgbm:
+  num_leaves: 31
+  max_depth: -1
+  learning_rate: 0.05
+  feature_fraction: 0.8
+  bagging_fraction: 0.8
+  min_child_samples: 20
+  reg_alpha: 0.1
+  reg_lambda: 0.1
+  num_boost_round: 1000
+
+# XGBoost configuration
+xgboost:
+  max_depth: 6
+  learning_rate: 0.05
+  subsample: 0.8
+  colsample_bytree: 0.8
+  reg_alpha: 0.1
+  reg_lambda: 1.0
+  num_boost_round: 1000
+
+# Model training flags
+train_nn: true
+train_lightgbm: true
+train_xgboost: false
+
+# Feature engineering
+feature_engineering:
+  enable_time_features: true
+  enable_amount_features: true
+  handle_outliers: true
+  outlier_percentile: 99.9
+
+# Calibration
+calibration:
+  enabled: true
+  method: "platt"  # Options: "platt", "isotonic"
 
 synthetic_data:
-  generate: false # Set to true to generate synthetic data if real data is not found
+  generate: false
   n_samples: 50000
   fraud_rate: 0.0017
